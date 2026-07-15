@@ -28,6 +28,8 @@ Mention:
 1. Largest spending category.
 2. One practical suggestion to reduce expenses.
 
+Your suggestion must relate directly to the largest category identified above.
+
 Keep it under 60 words.
 """
 

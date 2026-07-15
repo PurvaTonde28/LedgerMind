@@ -5,20 +5,12 @@ from graph.state import AgentState
 from agents.categorizer import categorizer_node
 from agents.anomaly_detector import anomaly_node
 from agents.budget_advisor import advisor_node
-
+from agents.hitl_gate import hitl_gate_node
 
 def route_after_anomaly(state: AgentState) -> str:
-    """
-    Phase 4:
-    Routing exists, but both paths go to advisor.
-
-    Phase 5:
-    if flagged -> hitl_gate
-    else -> advisor
-    """
 
     if state.get("flagged"):
-        return "advisor"
+        return "hitl_gate"
 
     return "advisor"
 
@@ -29,20 +21,24 @@ def build_graph(checkpointer):
 
     builder.add_node("categorizer", categorizer_node)
     builder.add_node("anomaly", anomaly_node)
+    builder.add_node("hitl_gate", hitl_gate_node)
     builder.add_node("advisor", advisor_node)
 
     builder.set_entry_point("categorizer")
 
     builder.add_edge("categorizer", "anomaly")
-
+    builder.add_edge("hitl_gate", "advisor")
+    builder.add_edge("advisor", END)
+    
     builder.add_conditional_edges(
         "anomaly",
         route_after_anomaly,
         {
-            "advisor": "advisor"
-        }
+            "hitl_gate": "hitl_gate",
+            "advisor": "advisor",
+        },
     )
 
-    builder.add_edge("advisor", END)
+    
 
     return builder.compile(checkpointer=checkpointer)

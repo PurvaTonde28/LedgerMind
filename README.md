@@ -1,4 +1,4 @@
-# MCP Server — Bank CSV Parser
+## Phase 1 - MCP Server — Bank CSV Parser
 Exposes a `parse_bank_csv_tool` via MCP (stdio transport) that parses bank 
 transaction CSVs into validated Pydantic models. Malformed rows (bad dates, 
 missing amounts) are skipped and logged rather than crashing the pipeline.
@@ -37,3 +37,11 @@ the Phase 2 dummy node) — `test_resume.py`, run as a separate process after
 `test_graph.py`, correctly retrieved the exact final state (including the 
 flagged transaction) from disk via `get_state()`, confirming checkpointing 
 survives the added routing complexity.
+
+## Phase 5 — Human-in-the-Loop Gate
+Added a `hitl_gate` node using LangGraph's `interrupt()`. When a transaction 
+is flagged, the graph genuinely pauses execution and persists at that point 
+via the checkpointer — verified by invoking, resuming, and rejecting across 
+three separate process invocations (not a single continuous script), each 
+confirmed via `Command(resume=...)` on a fresh process. Approve, reject, 
+and no-flag (skip-gate) paths all verified independently.
