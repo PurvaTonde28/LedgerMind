@@ -19,3 +19,21 @@ a static, LLM-free rule (flag if >2x category rolling average, skip if
 <5 historical points) — currently using placeholder category history 
 with an explicit runtime warning; real checkpointed history integration 
 is planned for a later phase.
+
+## Phase 4 — Supervisor & Conditional Routing
+Replaced manual node-chaining test scripts with a real LangGraph supervisor 
+(`categorizer` → `anomaly` → conditional edge → `advisor` → `END`), compiled 
+with the Phase 2 SQLite checkpointer.
+
+The conditional edge (`route_after_anomaly`) inspects `state["flagged"]` at 
+runtime — both branches currently route to `advisor` (real branching to a 
+`hitl_gate` node is Phase 5), but the routing mechanism itself is real and 
+verified: two separate runs (`flagged: 0` vs `flagged: 1`, forced by 
+changing the input amount) confirmed the graph reads live state to decide 
+routing, not a hardcoded path.
+
+Restart persistence was re-verified on this full multi-node graph (not just 
+the Phase 2 dummy node) — `test_resume.py`, run as a separate process after 
+`test_graph.py`, correctly retrieved the exact final state (including the 
+flagged transaction) from disk via `get_state()`, confirming checkpointing 
+survives the added routing complexity.
