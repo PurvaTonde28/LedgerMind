@@ -7,3 +7,4 @@ class AgentState(TypedDict):
     flagged: List[dict]
     user_decisions: List[dict]
     budget_summary: Optional[dict]
+    category_history: Optional[dict]   
