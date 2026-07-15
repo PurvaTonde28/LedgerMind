@@ -3,8 +3,8 @@ import logging
 import pandas as pd
 from pydantic import ValidationError
 
-from schema import Transaction
-from utils import clean_date, infer_raw_category
+from mcp_server.schema import Transaction
+from mcp_server.utils import clean_date, infer_raw_category
 
 logging.basicConfig(level=logging.INFO)
 
